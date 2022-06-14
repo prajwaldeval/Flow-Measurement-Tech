@@ -53,6 +53,7 @@ im2bg = im2;
 
 %looping through each 32x32 window to find its most likely velocity
 %component
+
 for i=1:(w_xcount)
     for j=1:(w_ycount)
         max_correlation = 0;
@@ -116,10 +117,15 @@ for i=1:(w_xcount)
         
         reference = im2(ref_ymin:ref_ymax,ref_xmin:ref_xmax);
         
+        if sum(bgr1,'all') == 0
+            dpx(i,j) = 0;
+            dpy(i,j) = 0;
+        else
+          correlation = normxcorr2(bgr1,reference);
+        end
         
-        
-        
-%         correlation = normxcorr2(window,reference);
+  
+%         correlation = normxcorr2(bgr1,reference);
 %         [xpeak, ypeak] = find (correlation == max(correlation(:)));
         
         % Re-scaling
