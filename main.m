@@ -16,11 +16,6 @@ im1 = im(1:size_y,:);
 im2 = im(size_y + 1:end,:);
 clear im;
 
-% Background computation, different methodologies - none of these really
-% make sense
-im_min = ((im1+im2) - abs(im1-im2))/2;
-im_ave = (im1 + im2)/2;
-im_sub = im1 - im2;
 
 
 % Window size 
@@ -29,64 +24,114 @@ w_height = wsize(1);
 w_width = wsize(2);
 
 % Search Window Size
-x_search = w_width*search_size;
-y_search = w_height*search_size;
+x_search = round(w_width*search_size);
+y_search = round(w_height*search_size);
 
-% Center points grid 
+% Center points grid
 xmin = w_width/2;
 ymin = w_height/2;
-xgrid = x_search:w_width/2:size_x-x_search; %starts & ends x&y grid such that
-ygrid = y_search:w_height/2:size_y-y_search;%there is always a search
-                                            %window sized margin outside
+xgrid = w_width/2:w_width:size_x;  %center point of each window in x
+ygrid = w_height/2:w_height:size_y;%center point of each window in y
 
-
-                                            
-% % % % % CHANGES FIXED UPTO HERE
-                                            
 % Number of windows in total
 w_xcount = length(xgrid);
 w_ycount = length(ygrid);
 
-
-
 xpeakl = 0;
 ypeakl = 0;
 
-test_im1(w_width, w_height) = 0; 
-test_im2(w_width+2*x_search, w_height + 2 * y_search) = 0; 
-dpx(w_xcount, w_ycount) = 0; 
-dpy(w_xcount, w_ycount) = 0; 
+%%Declaring vars for loop
+window(w_width, w_height) = 0; %initialise subwindow var
+reference(w_width+2*x_search, w_height + 2 * y_search) = 0; %initialise search area var
+dpx(w_xcount, w_ycount) = 0; %initialise vars for velocity comp in x
+dpy(w_xcount, w_ycount) = 0; %initialise vars for velocity comp in y
 
-xpeak1 = 0; 
-ypeak1 = 0;
 
-% i, j are for the windows
-% test_i and test_j are for the test window to be
-% extracted from image A
+im1bg = im1;
+im2bg = im2;
+
+
+%looping through each 32x32 window to find its most likely velocity
+%component
 for i=1:(w_xcount)
     for j=1:(w_ycount)
         max_correlation = 0;
-        test_xmin = xgrid(i) - w_width/ 2;
+        test_xmin = xgrid(i) - w_width/ 2 + 1;
+%         if test_xmin < 1
+%             test_xmit = 1;
+%         end
+        
         test_xmax = xgrid(i) + w_width/ 2;
-        test_ymin = ygrid(j) - w_height/2;
+        if test_xmax > size_x
+            test_xmax = size_x;
+        end
+       
+        test_ymin = ygrid(j) - w_height/2 + 1;
+%         if test_ymin < 1
+%             test_ymin = 1;
+%         end
+        
         test_ymax = ygrid(j) + w_height/2;
+        if test_ymax > size_y
+            test_ymax = size_y;
+        end
+        
         x_disp = 0;
         y_disp = 0;
-        test_im1 = im1(test_xmin:test_xmax, test_ymin:test_ymax);
-        test_im2 = im2(test_xmin:test_xmax, test_ymin:test_ymax);
-        correlation = normxcorr2(test_im1,test_im2);
-        [xpeak, ypeak] = find (correlation == max(correlation(:)));
+        
+        
+        
+        window1 = im1(test_ymin:test_ymax, test_xmin:test_xmax); %32x32 test window
+        window2 = im2(test_ymin:test_ymax, test_xmin:test_xmax); %32x32 test window (only for bg subtraction purposes)
+        
+        bg1 = min(window1,[],'all');
+        bg2 = min(window2,[],'all');
+        bg = min([bg1,bg2]);
+        bgr1 = window1 - bg; %window 1 with bg removed
+        bgr2 = window2 - bg; %window 2 with bg removed
+
+        im1(test_ymin:test_ymax, test_xmin:test_xmax) = bgr1;
+        im2(test_ymin:test_ymax, test_xmin:test_xmax) = bgr2;
+        
+        
+        ref_xmin = test_xmin - x_search/2 + 1;
+        if ref_xmin < 1
+            ref_xmin = 1;
+        end
+        
+        ref_xmax = test_xmax + x_search/2;
+        if ref_xmax > size_x
+            ref_xmax = size_x;
+        end
+        
+        ref_ymin = test_ymin - y_search/2 + 1;
+        if ref_ymin < 1
+            ref_ymin = 1;
+        end
+        
+        ref_ymax = test_ymax + y_search/2;
+        if ref_ymax > size_y
+            ref_ymax = size_y;
+        end
+        
+        reference = im2(ref_ymin:ref_ymax,ref_xmin:ref_xmax);
+        
+        
+        
+        
+%         correlation = normxcorr2(window,reference);
+%         [xpeak, ypeak] = find (correlation == max(correlation(:)));
         
         % Re-scaling
-        xpeakl = test_xmin + xpeak - wsize(1)/2 - x_search;
-        ypeakl = test_ymin + ypeak - wsize(2)/2 - y_search;
-        dpx(i,j) = xpeakl - xgrid(i);
-        dpy(i,j) = ypeakl - ygrid(j);
+%         xpeakl = test_xmin + xpeak - wsize(1)/2 - x_search;
+%         ypeakl = test_ymin + ypeak - wsize(2)/2 - y_search;
+%         dpx(i,j) = xpeakl - xgrid(i);
+%         dpy(i,j) = ypeakl - ygrid(j);
         
     end
 end
 
 %Vector Display 
-quiver(dpx, - dpy)
+% quiver(dpx, - dpy)
 
 
