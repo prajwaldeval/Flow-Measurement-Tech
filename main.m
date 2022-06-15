@@ -1,11 +1,12 @@
 clc;
 clear all;
 
-%from cal image
-pxtocm = 1/94.9; %px/cm
+%some fax
+pxtocm = 94.9; %px/cm from cal image
+dt = 70e-6; %time between the two images
 
 %set vars
-windowsize = 32;
+windowsize = 24;
 search_size = 0.75;%as proportion of window size
 
 % Reading TIF images
@@ -32,8 +33,8 @@ y_search = round(w_height*search_size);
 % Center points grid
 xmin = w_width/2;
 ymin = w_height/2;
-xgrid = w_width/2:w_width:size_x;  %center point of each window in x
-ygrid = w_height/2:w_height:size_y;%center point of each window in y
+xgrid = w_width:w_width:size_x;  %center point of each window in x
+ygrid = w_height:w_height:size_y;%center point of each window in y
 
 % Number of windows in total
 w_xcount = length(xgrid);
@@ -42,10 +43,10 @@ w_ycount = length(ygrid);
 
 
 %%Declaring vars for loop
-window(w_width, w_height) = 0; %initialise subwindow var
-reference(w_width+2*x_search, w_height + 2 * y_search) = 0; %initialise search area var
-dpx(w_xcount, w_ycount) = 0; %initialise vars for velocity comp in x
-dpy(w_xcount, w_ycount) = 0; %initialise vars for velocity comp in y
+window(w_height, w_width) = 0; %initialise subwindow var
+reference( w_height + 2 * y_search, w_width+2*x_search) = 0; %initialise search area var
+dpx(w_ycount, w_xcount) = 0; %initialise vars for velocity comp in x
+dpy(w_ycount, w_xcount) = 0; %initialise vars for velocity comp in y
 
 
 im1bg = im1;
@@ -151,14 +152,14 @@ for i=1:(w_xcount)
         
         if sum(test,'all') == 0
 %             disp('Assume 0');
-            dpx(i,j) = 0;
-            dpy(i,j) = 0;
+            dpx(j,i) = 0;
+            dpy(j,i) = 0;
         else
 %           disp('Calculating xcorr');
           correlation = normxcorr2(test,reference);
           [maxcorr_y, maxcorr_x] = find(abs(correlation) == max(abs(correlation(:))));
-          dpx(i,j) = ref_xmin - w_width/2 + maxcorr_x - xgrid(i);
-          dpy(i,j) = ref_ymin - w_height/2 + maxcorr_y - ygrid(j);
+          dpx(j,i) = ref_xmin - w_width/2 + maxcorr_x - xgrid(i);
+          dpy(j,i) = ref_ymin - w_height/2 + maxcorr_y - ygrid(j);
         end
         
         
@@ -170,6 +171,10 @@ for i=1:(w_xcount)
         
     end
 end
+vx = fliplr(0.01*((dpx./dt) /pxtocm));
+vy = fliplr(0.01*((dpy./dt) /pxtocm));
+image(vx);
+
 
 %Vector Display 
 % quiver(dpx, - dpy)
