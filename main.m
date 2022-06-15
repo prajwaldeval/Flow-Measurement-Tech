@@ -5,9 +5,11 @@ clear all;
 pxtocm = 94.9; %px/cm from cal image
 dt = 70e-6; %time between the two images
 
+
 %set vars
 windowsize = 24;
-search_size = 0.75;%as proportion of window size
+search_size = 2;%as proportion of window size
+stdev_threshold= 1;
 
 % Reading TIF images
 im_cal = imread('Data/B00001_cal.tif');
@@ -171,10 +173,17 @@ for i=1:(w_xcount)
         
     end
 end
+stdev_threshold = 1;
 vx = fliplr(0.01*((dpx./dt) /pxtocm));
 vy = fliplr(0.01*((dpy./dt) /pxtocm));
-image(vx);
+v = sqrt(vx.*vx + vy.*vy);
+stdev = std(v,0,'all');
+meanv = mean(mean(v));
 
+vx((v-meanv)/stdev > stdev_threshold) = NaN;
+vy((v-meanv)/stdev > stdev_threshold) = NaN;
+
+quiver(vx,vy);
 
 %Vector Display 
 % quiver(dpx, - dpy)
