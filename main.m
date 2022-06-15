@@ -1,6 +1,8 @@
 clc;
 clear all;
 
+%from cal image
+pxtocm = 1/94.9; %px/cm
 
 %set vars
 windowsize = 32;
@@ -11,7 +13,7 @@ im_cal = imread('Data/B00001_cal.tif');
 
 im = imread('Data/B00010.tif');
 [size_y,size_x] = size(im);
-size_y= size_y/2; %pictures are stacked together so height is actually half
+size_y = size_y/2; %pictures are stacked together so height is actually half
 im1 = im(1:size_y,:);
 im2 = im(size_y + 1:end,:);
 clear im;
@@ -118,11 +120,18 @@ for i=1:(w_xcount)
         reference = im2(ref_ymin:ref_ymax,ref_xmin:ref_xmax);
         
         if sum(bgr1,'all') == 0
+%             disp('Assume 0');
             dpx(i,j) = 0;
             dpy(i,j) = 0;
         else
+%           disp('Calculating xcorr');
           correlation = normxcorr2(bgr1,reference);
+          [maxcorr_y, maxcorr_x] = find(abs(correlation) == max(abs(correlation(:))));
+          dpx(i,j) = ref_xmin - w_width/2 + maxcorr_x - xgrid(i);
+          dpy(i,j) = ref_ymin - w_height/2 + maxcorr_y - ygrid(j);
         end
+        
+        
         
   
 %         correlation = normxcorr2(bgr1,reference);
