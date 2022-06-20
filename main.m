@@ -1,9 +1,10 @@
 clc;
 clear all;
 
+
 %some fax
 pxtocm = 94.9; %px/cm from cal image
-dt = 70e-6; %time between the two images
+dt = 73e-6; %time between the two images
 
 
 %set vars
@@ -20,10 +21,12 @@ size_y = size_y/2; %pictures are stacked together so height is actually half
 im1 = im(1:size_y,:);
 im2 = im(size_y + 1:end,:);
 clear im;
-% 
-% im1 = imread('Data/Image_0001_a.tif');
-% im2 = imread('Data/Image_0001_b.tif');
-% [size_y,size_x] = size(im1);
+
+%% Uncomment next 3 lines to use example images 
+im1 = imread('Data/Image_0001_a.tif');
+im2 = imread('Data/Image_0001_b.tif');
+[size_y,size_x] = size(im1);
+%%
 
 % Window size 
 wsize = [windowsize, windowsize];
@@ -37,8 +40,8 @@ y_search = round(w_height*search_size);
 % Center points grid
 xmin = w_width/2;
 ymin = w_height/2;
-xgrid = w_width:w_width:size_x;  %center point of each window in x
-ygrid = w_height:w_height:size_y;%center point of each window in y
+xgrid = 0:w_width:size_x;  %center point of each window in x
+ygrid = 0:w_height:size_y;%center point of each window in y
 
 xgrid = w_width/2:w_width:size_x;  %center point of each window in x
 ygrid = w_height/2:w_height:size_y;%center point of each window in y
@@ -58,50 +61,50 @@ dpy(w_ycount, w_xcount) = 0; %initialise vars for velocity comp in y
 meancorr(w_ycount,w_xcount) = 0;
 stdcorr(w_ycount,w_xcount) = 0;
 
-% im1bg = im1;
-% im2bg = im2;
-% for i=1:(w_xcount)
-%     for j=1:(w_ycount)
-%         max_correlation = 0;
-%         test_xmin = xgrid(i) - w_width/ 2 + 1;
-% %         if test_xmin < 1
-% %             test_xmit = 1;
-% %         end
-%         
-%         test_xmax = xgrid(i) + w_width/ 2;
-%         if test_xmax > size_x
-%             test_xmax = size_x;
+im1bg = im1;
+im2bg = im2;
+for i=1:(w_xcount)
+    for j=1:(w_ycount)
+        max_correlation = 0;
+        test_xmin = xgrid(i) - w_width/ 2 + 1;
+%         if test_xmin < 1
+%             test_xmit = 1;
 %         end
-%        
-%         test_ymin = ygrid(j) - w_height/2 + 1;
-% %         if test_ymin < 1
-% %             test_ymin = 1;
-% %         end
-%         
-%         test_ymax = ygrid(j) + w_height/2;
-%         if test_ymax > size_y
-%             test_ymax = size_y;
+        
+        test_xmax = xgrid(i) + w_width/ 2;
+        if test_xmax > size_x
+            test_xmax = size_x;
+        end
+       
+        test_ymin = ygrid(j) - w_height/2 + 1;
+%         if test_ymin < 1
+%             test_ymin = 1;
 %         end
-%         
-%         x_disp = 0;
-%         y_disp = 0;
-%         
-%         
-%         
-%         window1 = im1(test_ymin:test_ymax, test_xmin:test_xmax); %32x32 test window
-%         window2 = im2(test_ymin:test_ymax, test_xmin:test_xmax); %32x32 test window (only for bg subtraction purposes)
-%         
-%         bg1 = min(window1,[],'all');
-%         bg2 = min(window2,[],'all');
-%         bg = min([bg1,bg2]);
-%         bgr1 = window1 - bg; %window 1 with bg removed
-%         bgr2 = window2 - bg; %window 2 with bg removed
-% 
-%         im1(test_ymin:test_ymax, test_xmin:test_xmax) = bgr1;
-%         im2(test_ymin:test_ymax, test_xmin:test_xmax) = bgr2;
-% 
-%     end
-% end
+        
+        test_ymax = ygrid(j) + w_height/2;
+        if test_ymax > size_y
+            test_ymax = size_y;
+        end
+        
+        x_disp = 0;
+        y_disp = 0;
+        
+        
+        
+        window1 = im1(test_ymin:test_ymax, test_xmin:test_xmax); %32x32 test window
+        window2 = im2(test_ymin:test_ymax, test_xmin:test_xmax); %32x32 test window (only for bg subtraction purposes)
+        
+        bg1 = min(window1,[],'all');
+        bg2 = min(window2,[],'all');
+        bg = min([bg1,bg2]);
+        bgr1 = window1 - bg; %window 1 with bg removed
+        bgr2 = window2 - bg; %window 2 with bg removed
+
+        im1(test_ymin:test_ymax, test_xmin:test_xmax) = bgr1;
+        im2(test_ymin:test_ymax, test_xmin:test_xmax) = bgr2;
+
+    end
+end
 
 %looping through each 32x32 window to find its most likely velocity
 %component
@@ -167,6 +170,7 @@ for i=1:(w_xcount)
 %           disp('Calculating xcorr');
           correlation = normxcorr2(test,reference);
           [maxcorr_y, maxcorr_x] = find(abs(correlation) == max(abs(correlation(:))));
+%           [maxcorr_y, maxcorr_x] = find(correlation == max(correlation(:)));
           meancorr(j,i) = mean(correlation,'all');
           stdcorr(j,i) = std(correlation,0,'all');
           dpx(j,i) = ref_xmin - w_width/2 + maxcorr_x - xgrid(i);
@@ -187,18 +191,22 @@ vx = fliplr(0.01*((dpx./dt) /pxtocm));
 vy = fliplr(0.01*((dpy./dt) /pxtocm));
 quiver(vx,vy)
 v = sqrt(vx.*vx + vy.*vy);
+vx(v>15) = 0;
+vy(v>15) = 0;
 stdev = std(v,0,'all');
 meanv = mean(mean(v));
+SNR = stdcorr./meancorr;
 
-vx((v-meanv)/stdev > stdev_threshold) = NaN;
-vy((v-meanv)/stdev > stdev_threshold) = NaN;
+vx((v-meanv)/stdev > stdev_threshold) = 0;
+vy((v-meanv)/stdev > stdev_threshold) = 0;
 
-quiver(vx,vy);
 
 %Vector Display 
 imagesc(im2);
-hold on;
+hold on
 colormap('hot')
+% a = colorbar;
+% a.Label.String = 'Vx [m/s]';
 quiver(xgrid,ygrid,vx,vy);
 hold off;
 % quiver(dpx, - dpy)
