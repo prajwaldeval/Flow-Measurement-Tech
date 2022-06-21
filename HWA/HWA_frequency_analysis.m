@@ -1,59 +1,20 @@
 clc; clear; close all;
 
+
+
 %%
 option = 3; 
-if (option == 1)
-    load('Signal1');
-elseif (option == 2)
-    load('Signal2');
-elseif (option == 3)
-    fileIn = 'C:\Users\LocalAdmin\Documents\FMT\2022\G20\CorrelationTest2';
+if (option == 3)
+    fileIn = 'C:\Users\mvret\Desktop\Flow-Measurement-Tech\HWA\G20\Calibration_004';
     data  = dlmread(fileIn,'',23,0);
     t     = data(:,1); 
-    u     = data(:,2); 
+    E     = data(:,2); 
+    u = 46.256*E.^4 - 226.55*E.^3 + 444.82*E.^2 - 400.82*E + 136.52 ;
     clear data fileIn
     yrange = [-.2 .2];
     ytickvar  = [-.1:.1:.1];
     ystr = 'E'' [V]';
-    nsub = 200;
-elseif (option == 4)
-    fileIn = 'DTUdata/Group14.txt';
-    data   = load(fileIn); t     = data(:,1); 
-    u     = data(:,2); 
-    clear data fileIn
-    yrange = [-12 12];
-    ytickvar  = [-10:5:10];
-    nsub = 500;
-    ystr = 'u'' [m/s]';
-elseif (option == 5)
-    fileIn = 'testdata/frequencydetermination2';
-    
-    delimiter = ' ';
-    startRow = 23;
-    formatSpec = '%s';
-    try
-        fileID = fopen(fileIn,'r');
-    catch
-        fileID = fopen(fileIn{1},'r');
-    end
-    tmp = textscan(fileID, formatSpec, 'Delimiter', delimiter, 'TextType', 'string', 'HeaderLines' ,startRow, 'ReturnOnError', false, 'EndOfLine', '\r\n');
-    fclose(fileID);
-    tmp2 = strrep(tmp{1},',','.');
-    
-    fileOut = strcat(fileIn,'_mat');
-    fileId = fopen(fileOut,'w');
-    fprintf(fileId, '%s\n', tmp2);
-    fclose(fileID);
-    
-    
-    data  = dlmread(fileOut); 
-    t     = data(:,1); 
-    u     = data(:,2); 
-    clear data fileIn
-    yrange = [-.1 .1];
-    ytickvar  = [-.1:.05:.1];
-    ystr = 'E'' [V]';
-    nsub = 1000;
+    nsub = 850;
 end
 dt = t(2)-t(1); 
 config = 2;
@@ -64,10 +25,10 @@ subplot(211)
 plot(t(1:nt),u(1:nt)-mean(u(1:nt)));
 grid on;  xlabel('t [s]'); box on; ylabel(ystr);
 set(gca,'fontsize',14,'ylim',yrange,'ytick',ytickvar); 
-% hold on; plot(t(nsub)*1000*[1 1],[floor(min(u)) ceil(max(u))])
+hold on; plot(t(nsub)*1000*[1 1],[floor(min(u)) ceil(max(u))])
 
 subplot(212)
-plot(t(1000:1000+nsub)*1000,u(1000:1000+nsub)-mean(u(1:nsub)));
+plot(t(nsub)*1000,u(nsub)-mean(u(1:nsub)));
 grid on;  xlabel('t [ms]'); box on; ylabel(ystr);
 set(gca,'fontsize',14,'ylim',yrange,'ytick',ytickvar);  
 hold on; 
@@ -118,10 +79,10 @@ ht = annotation('textbox',[.69 .2 0.4 0.03],'String',txtstr,'FitBoxToText','off'
                 'edgecolor','none','fontsize',15,'HorizontalAlignment','left','color','k','interpreter','latex');
 % return
 %% power spectrum
-% [Pxx,F] = pwelch(X,WINDOW,NOVERLAP,NFFT,Fs)
+[Pxx,F] = pwelch(X,WINDOW,NOVERLAP,NFFT,Fs)
 f_acq = (t(2)-t(1))^-1;
 L = 10000;
-win = hanning(L);
+win = hann(L);
 Noverlap = L/2;
 [Pxx,freq] = pwelch(up,win,Noverlap,L,f_acq);
 figure(3); clf; set(gcf,'color','w','position',[1253 556 560 420]); 
@@ -133,3 +94,7 @@ txtstr = sprintf('[f = %4i Hz]',round(freq(indz2)));
 ht = annotation('textbox',[.61 .895 0.4 0.03],'String',txtstr,'FitBoxToText','off',...
                 'edgecolor','none','fontsize',15,'HorizontalAlignment','left','color','k','interpreter','latex');
 set(gca,'fontsize',14,'xlim',[10 5e3])
+
+function u = kingslaw(E)
+    kingslaw = 46.256*E.^4 - 226.55*E.^3 + 444.82*E.^2 - 400.82*E + 136.52;
+end

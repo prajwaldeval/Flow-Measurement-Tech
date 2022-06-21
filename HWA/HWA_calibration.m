@@ -2,7 +2,7 @@ clc; clear variables; close all;
 
 %%  Config
 urange = 0:2:20; 
-FileRoot = 'C:\Users\LocalAdmin\Documents\FMT\2022\G20\Calibration_'; 
+FileRoot = 'C:\Users\mvret\Desktop\Flow-Measurement-Tech\HWA\G20\Calibration_'; 
 
 for ii = 1:numel(urange)
 %     fileIn = sprintf(fileName,urange(ii))
@@ -12,7 +12,7 @@ else
         fileIn = [FileRoot '0' num2str(urange(ii),'%3d')];
 end
     delimiter = ' ';
-    startRow = 23;
+    startRow = 24;
     formatSpec = '%s';
     try
         fileID = fopen(fileIn,'r');
@@ -47,7 +47,7 @@ plot(polyval(c,xplot),xplot)
 xlabel('u [m/s]'); ylabel('E [V]'); 
 set(gca,'fontsize',14)
 
-% dim = [.2 .5 .3 .3];
-% str = 'u = (%2.2f) E^4 + (%2.2f) E^3 + (%2.2f) E^2 + (%2.2f) E + (%2.2f)';
+dim = [.2 .5 .3 .3];
+str = 'u = (%2.2f) E^4 + (%2.2f) E^3 + (%2.2f) E^2 + (%2.2f) E + (%2.2f)'
 % annotation('textbox',dim,'String',sprintf(str,c),'FitBoxToText','on');
 %title(sprintf(str,c))
