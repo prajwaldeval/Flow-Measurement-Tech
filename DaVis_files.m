@@ -3,8 +3,8 @@ clear all;
 
 %%Define Location of files
 path = 'Data/Drive/';
-subfolder = '0_optimal';
-meanrms = strcat('/',subfolder,'_stats');
+subfolder = '15_optimal';
+meanrms = strcat('/',subfolder,'_stats_10_images');
 
 %%Same for all
 instant = '/B00001.dat';

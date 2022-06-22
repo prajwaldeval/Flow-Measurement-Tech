@@ -23,9 +23,9 @@ im2 = im(size_y + 1:end,:);
 clear im;
 
 %% Uncomment next 3 lines to use example images 
-im1 = imread('Data/Image_0001_a.tif');
-im2 = imread('Data/Image_0001_b.tif');
-[size_y,size_x] = size(im1);
+% im1 = imread('Data/Image_0001_a.tif');
+% im2 = imread('Data/Image_0001_b.tif');
+% [size_y,size_x] = size(im1);
 %%
 
 % Window size 
@@ -202,7 +202,7 @@ vy((v-meanv)/stdev > stdev_threshold) = 0;
 
 
 %Vector Display 
-imagesc(im2);
+imagesc(flipud(im2));
 hold on
 colormap('hot')
 % a = colorbar;

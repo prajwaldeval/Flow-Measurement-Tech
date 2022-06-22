@@ -4,10 +4,11 @@ close all
 
 %% Data Extraction 
 
-AoA = '_15'; %%%%%%%%%%%%%%%%  CHOOSE ANGLE OF ATTACK  %%%%%%%%%%%%%%%%%%%%
+AoA = '_00'; %%%%%%%%%%%%%%%%  CHOOSE ANGLE OF ATTACK  %%%%%%%%%%%%%%%%%%%%
 
 % Calibration data
-FileRoot = 'C:\Users\mvret\Desktop\Flow-Measurement-Tech\HWA\G20\Calibration_'; 
+FileRoot = 'C:\Users\prajw\Documents\Study Stuff\MSc-1\FlowMeasurementTech\FMT\HWA\G20\Calibration_'; 
+
 
 time = [];
 voltage = [];
@@ -20,9 +21,9 @@ data_cali = [];  % Calibration data
 for i = 0:2:20
     
 if i < 10
-    fileIn = [FileRoot '00' num2str(i,'%3d')];
+    fileIn = [FileRoot, '00', num2str(i,'%3d')];
 else
-    fileIn = [FileRoot '0' num2str(i,'%3d')];
+    fileIn = [FileRoot, '0', num2str(i,'%3d')];
 end
 
 delimiter = ' ';
@@ -61,7 +62,7 @@ sigma_voltage = [sigma_voltage std(voltage(:,i))] ;
 end
 
 % Measured data
-FileRoot = 'C:\Users\mvret\Desktop\Flow-Measurement-Tech\HWA\G20\Measurement_';
+FileRoot = 'C:\Users\prajw\Documents\Study Stuff\MSc-1\FlowMeasurementTech\FMT\HWA\G20\Measurement_';
 
 data_meas = [];  % Measurement data
 time_meas = [];
@@ -133,16 +134,16 @@ kings_coefficients = polyfit(mean_voltage , velocity , 4) ;
 voltage_range = linspace(mean_voltage (1) , mean_voltage (end) ) ;
 p = polyval( kings_coefficients , voltage_range ) ;
 
-figure (1)
-plot ( velocity , mean_voltage , ' o ' )
-hold on
-plot (p , voltage_range ) ;
-title( ' Calibration Curve ' )
-xlabel ( 'U [m/s ] ' )
-ylabel ( 'E [V] ' )
-xlim ( [ 0 20])
-grid
-hold off
+% figure (1)
+% plot ( velocity, mean_voltage , ' o ' )
+% hold on
+% plot (p , voltage_range ) ;
+% title( ' Calibration Curve ' )
+% xlabel ( 'U [m/s ] ' )
+% ylabel ( 'E [V] ' )
+% xlim ( [ 0 20])
+% grid
+% hold off
 
 %% Velocity 
 c = kings_coefficients;
@@ -159,39 +160,39 @@ sigma_velocity_meas = std( velocity_meas ) ;
 %% Time Series
 N = 3; % Number of measurement for autocorrelation
 
-figure (2)
-scatter(time(:,N) , voltage(:,N), 5,'filled' )
-hold on
-plot (time(:,N) , (mean_voltage(N)*ones(1 , length(time(:,N)) ) ) , ' r ' )
-hold on
-plot (time(:,N) , (mean_voltage(N) + 3*sigma_voltage(N) )*ones(1 , length(time(:,N)) ) , 'k ' )
-hold on
-plot (time(:,N) , (mean_voltage(N) - 3*sigma_voltage(N) )*ones(1 , length(time(:,N)) ) , 'k ' )
-title( 'Time Series of Signal ' )
-xlabel( 'T [s] ' )
-ylabel( 'E [V] ' )
-legend( 'E' , 'E_{mean} ' , '3 \sigma_{E} ' )
-grid
-hold off
+% figure (2)
+% scatter(time(:,N) , voltage(:,N), 5,'filled' )
+% hold on
+% plot (time(:,N) , (mean_voltage(N)*ones(1 , length(time(:,N)) ) ) , ' r ' )
+% hold on
+% plot (time(:,N) , (mean_voltage(N) + 3*sigma_voltage(N) )*ones(1 , length(time(:,N)) ) , 'k ' )
+% hold on
+% plot (time(:,N) , (mean_voltage(N) - 3*sigma_voltage(N) )*ones(1 , length(time(:,N)) ) , 'k ' )
+% title( 'Time Series of Signal ' )
+% xlabel( 'T [s] ' )
+% ylabel( 'E [V] ' )
+% legend( 'E' , 'E_{mean} ' , '3 \sigma_{E} ' )
+% grid
+% hold off
 
-figure (3)
-plot ((1000*time(1:300,N) ) , voltage(1:300,N) )
-hold on
-plot ((1000*time(1:300,N) ) , mean_voltage(N)*ones (1 , length (time(1:300,N) ) ) , ' r ' )
-hold on
-plot ((1000*time(1:300,N) ) , (mean_voltage(N) + sigma_voltage(N))*ones(1,length(time(1:300,N))),'k')
-hold on
-plot ((1000*time(1:300,N) ) , (mean_voltage(N) - sigma_voltage(N))*ones(1,length(time(1:300,N))),'k')
-title( 'Time Series of Signal ' )
-xlabel ( 'T [ms] ' )
-ylabel ( 'E [V] ' )
-% ylim ( [ 1.7  1.74 ] )
-legend ( 'E' , 'E_{mean} ' , ' \sigma_{E} ' )
-grid
-hold off
+% figure (3)
+% plot ((1000*time(1:300,N) ) , voltage(1:300,N) )
+% hold on
+% plot ((1000*time(1:300,N) ) , mean_voltage(N)*ones (1 , length (time(1:300,N) ) ) , ' r ' )
+% hold on
+% plot ((1000*time(1:300,N) ) , (mean_voltage(N) + sigma_voltage(N))*ones(1,length(time(1:300,N))),'k')
+% hold on
+% plot ((1000*time(1:300,N) ) , (mean_voltage(N) - sigma_voltage(N))*ones(1,length(time(1:300,N))),'k')
+% title( 'Time Series of Signal ' )
+% xlabel ( 'T [ms] ' )
+% ylabel ( 'E [V] ' )
+% % ylim ( [ 1.7  1.74 ] )
+% legend ( 'E' , 'E_{mean} ' , ' \sigma_{E} ' )
+% grid
+% hold off
 
 %% Correlation data
-FileRoot = 'C:\Users\mvret\Desktop\Flow-Measurement-Tech\HWA\G20\CorrelationTest'; 
+FileRoot = 'C:\Users\prajw\Documents\Study Stuff\MSc-1\FlowMeasurementTech\FMT\HWA\G20\CorrelationTest'; 
 
 time_cor = [];
 voltage_cor = [];
@@ -256,26 +257,26 @@ rho = acorr( length ( voltage_cor ) : ( length ( voltage_cor ) + numero) ) ;
 
 T = ( 0 : ( length ( rho ) -1) ) .* dt ;
 freq = 1./(T) ;
-figure (4)
-plot ((T*1000) , rho , 'k ' )
-title( ' Autocorrelation ' )
-xlabel ( 'T [ms] ' )
-ylabel ( ' \rho [ - ] ' )
-grid
-hold on
-plot ((T*1000) , conv_crit*ones (1 , length (T) ) , ' r ' )
-legend ( 'Correlation Coefficient ' , ' Convergence Criteria ' )
-hold off
-figure (5)
-semilogx ( freq , rho , 'k ' )
-title( ' Autocorrelation ' )
-xlabel ( ' f [Hz ] ' )
-ylabel ( ' \rho [ - ] ' )
-grid
-hold on
-plot ( freq , conv_crit*ones (1 , length (T) ) , ' r ' )
-legend ( ' Correlation Coefficient ' , ' Convergence Criterion ' , ' location ' , ' northwest ' )
-hold off
+% figure (4)
+% plot ((T*1000) , rho , 'k ' )
+% title( ' Autocorrelation ' )
+% xlabel ( 'T [ms] ' )
+% ylabel ( ' \rho [ - ] ' )
+% grid
+% hold on
+% plot ((T*1000) , conv_crit*ones (1 , length (T) ) , ' r ' )
+% legend ( 'Correlation Coefficient ' , ' Convergence Criteria ' )
+% hold off
+% figure (5)
+% semilogx ( freq , rho , 'k ' )
+% title( ' Autocorrelation ' )
+% xlabel ( ' f [Hz ] ' )
+% ylabel ( ' \rho [ - ] ' )
+% grid
+% hold on
+% plot ( freq , conv_crit*ones (1 , length (T) ) , ' r ' )
+% legend ( ' Correlation Coefficient ' , ' Convergence Criterion ' , ' location ' , ' northwest ' )
+% hold off
 
 %%%%%%%%%%%%%%%%%%%%%%
 % nt = 10000;
@@ -316,62 +317,62 @@ w = hann( floor( length ( voltage(:,3) )/na) ) ; % Window
 w_ov = length(w)*ov ; % Window overlap
 [ psd , f ] = pwelch( voltage(:,3), w, w_ov, [ ] , SR) ;
 f_bin = f (2) - f (1) ; % Frequency bin width [Hz ]
-PSD = psd*f_bin ; % Power spectral density [ unit /Hz ]
-figure(6)
-loglog( f , PSD)
-title( ' Spectral Analysis ' )
-xlabel( ' f [Hz ] ' )
-ylabel( 'PSD [m^2/ s^2/Hz ] ' )
-xlim([10 5000])
-grid
+PSD = psd*f_bin; % Power spectral density [ unit /Hz ]
+% figure(6)
+% loglog( f , PSD)
+% title( ' Spectral Analysis ' )
+% xlabel( ' f [Hz ] ' )
+% ylabel( 'PSD [m^2/ s^2/Hz ] ' )
+% xlim([10 5000])
+% grid
 
 %% Amplitude Analysis
 
 
 % Time Series of Velocity
 MN = 20; % Measurement number
-figure(7)
-P(1) = plot( time_meas( : ,MN) , velocity_meas( : ,MN) ) ;
-hold on
-P(2) = plot( time_meas( : ,MN) ,( mean_velocity_meas(MN)*ones(1 , length( time_meas( : ,MN)))), ' r ' ) ;
-hold on
-P(3) = plot(time_meas(:,MN),(mean_velocity_meas(MN)+sigma_velocity_meas(MN))*ones(1,length(time_meas(:,MN))),'k');
-hold on
-P(4) = plot( time_meas( : ,MN) ,( mean_velocity_meas(MN) - sigma_velocity_meas(MN) )*ones(1 , length( time_meas( : ,MN) ) ) , 'k ' ) ;
-hold on
-P(5) = plot( time_meas( : ,MN) ,( mean_velocity_meas(MN)+3*sigma_velocity_meas(MN) )*ones(1 , length( time_meas ( : ,MN) ) ) , ' --k ' ) ;
-hold on
-plot(time_meas(:,MN),(mean_velocity_meas(MN)-3*sigma_velocity_meas(MN))*ones(1,length(time_meas(:,MN))),'--k');
-title( 'Time Series of Velocity ' )
-xlabel( 'T [ s ] ' )
-ylabel( 'U [m/s ] ' )
-ylim( [ 0 20])
-legend(P( [ 1 2 3 5 ] ) , 'U' , 'U_{mean} ' , 'U_{RMS} ' , ' 3\sigma_{U} ' , ' location ' , ' northwest ' )
-grid
-hold off
+% figure(7)
+% P(1) = plot( time_meas( : ,MN) , velocity_meas( : ,MN) ) ;
+% hold on
+% P(2) = plot( time_meas( : ,MN) ,( mean_velocity_meas(MN)*ones(1 , length( time_meas( : ,MN)))), ' r ' ) ;
+% hold on
+% P(3) = plot(time_meas(:,MN),(mean_velocity_meas(MN)+sigma_velocity_meas(MN))*ones(1,length(time_meas(:,MN))),'k');
+% hold on
+% P(4) = plot( time_meas( : ,MN) ,( mean_velocity_meas(MN) - sigma_velocity_meas(MN) )*ones(1 , length( time_meas( : ,MN) ) ) , 'k ' ) ;
+% hold on
+% P(5) = plot( time_meas( : ,MN) ,( mean_velocity_meas(MN)+3*sigma_velocity_meas(MN) )*ones(1 , length( time_meas ( : ,MN) ) ) , ' --k ' ) ;
+% hold on
+% plot(time_meas(:,MN),(mean_velocity_meas(MN)-3*sigma_velocity_meas(MN))*ones(1,length(time_meas(:,MN))),'--k');
+% title( 'Time Series of Velocity ' )
+% xlabel( 'T [ s ] ' )
+% ylabel( 'U [m/s ] ' )
+% ylim( [ 0 20])
+% legend(P( [ 1 2 3 5 ] ) , 'U' , 'U_{mean} ' , 'U_{RMS} ' , ' 3\sigma_{U} ' , ' location ' , ' northwest ' )
+% grid
+% hold off
 %% Velocity Profile
 Y = 34:4:106;
-figure (8)
-plot( mean_velocity_meas(2:20) , Y, ' -x r ' )
-% hold on
-% plot( mean_velocity_meas(21:40) , Y, ' -x b ' )
-% hold on
-% plot( mean_velocity_meas(41:60) , Y, ' -x k ' )
-title( ' Velocity Profile' )
-xlabel( 'U_{mean} [m/s ] ' )
-ylabel( 'Y [mm] ' )
-grid
-% legend ( ' \alpha = 0\circ ' , ' \alpha = 5\circ ' , ' \alpha = 15\circ ' , ' location ' , ' east ' )
-hold off
-figure(9)
-plot( sigma_velocity_meas(2:20) , Y, ' -x r ' )
-% hold on
-% plot( sigma_velocity_meas(22:42) , Y, ' -x b ' )
-% hold on
-% plot( sigma_velocity_meas(43:63) , Y, ' -x k ' )
-title( ' Velocity Profile' )
-xlabel( 'U_{RMS} [m/s]' )
-ylabel( 'Y [mm]' )
-grid
-% legend ('\alpha = 0\circ', '\alpha = 5\circ', '\alpha = 15\circ')
-hold off
+% figure (8)
+% plot( mean_velocity_meas(2:20) , Y, ' -x r ' )
+% % hold on
+% % plot( mean_velocity_meas(21:40) , Y, ' -x b ' )
+% % hold on
+% % plot( mean_velocity_meas(41:60) , Y, ' -x k ' )
+% title( ' Velocity Profile' )
+% xlabel( 'U_{mean} [m/s ] ' )
+% ylabel( 'Y [mm] ' )
+% grid
+% % legend ( ' \alpha = 0\circ ' , ' \alpha = 5\circ ' , ' \alpha = 15\circ ' , ' location ' , ' east ' )
+% hold off
+% figure(9)
+% plot( sigma_velocity_meas(2:20) , Y, ' -x r ' )
+% % hold on
+% % plot( sigma_velocity_meas(22:42) , Y, ' -x b ' )
+% % hold on
+% % plot( sigma_velocity_meas(43:63) , Y, ' -x k ' )
+% title( ' Velocity Profile' )
+% xlabel( 'U_{RMS} [m/s]' )
+% ylabel( 'Y [mm]' )
+% grid
+% % legend ('\alpha = 0\circ', '\alpha = 5\circ', '\alpha = 15\circ')
+% hold off
