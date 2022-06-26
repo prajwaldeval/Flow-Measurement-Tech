@@ -326,8 +326,23 @@ PSD = psd*f_bin; % Power spectral density [ unit /Hz ]
 % xlim([10 5000])
 % grid
 
-%% Amplitude Analysis
+%% Sampling rate 
+% For rho=0.1 -> optimal SR = 29.4Hz
+% For rho=0.2 -> optimal SR = 35.7Hz
+% Original sampling rate of experiment -> f = 170Hz
+% thus approximately 1 in 5 measurements
 
+timeSR = time_meas;
+velocitySR = velocity_meas;
+time_meas = timeSR(1,:);
+velocity_meas = velocitySR(1,:);
+for i = 1:5:850
+    time_meas = [time_meas;timeSR(i,:)];
+    velocity_meas = [velocity_meas;velocitySR(i,:)];
+end
+
+
+%% Amplitude Analysis
 
 % Time Series of Velocity
 MN = 20; % Measurement number
@@ -340,6 +355,7 @@ MN = 20; % Measurement number
 % hold on
 % P(4) = plot( time_meas( : ,MN) ,( mean_velocity_meas(MN) - sigma_velocity_meas(MN) )*ones(1 , length( time_meas( : ,MN) ) ) , 'k ' ) ;
 % hold on
+<<<<<<< Updated upstream
 % P(5) = plot( time_meas( : ,MN) ,( mean_velocity_meas(MN)+3*sigma_velocity_meas(MN) )*ones(1 , length( time_meas ( : ,MN) ) ) , ' --k ' ) ;
 % hold on
 % plot(time_meas(:,MN),(mean_velocity_meas(MN)-3*sigma_velocity_meas(MN))*ones(1,length(time_meas(:,MN))),'--k');
@@ -376,3 +392,12 @@ Y = 34:4:106;
 % grid
 % % legend ('\alpha = 0\circ', '\alpha = 5\circ', '\alpha = 15\circ')
 % hold off
+=======
+% plot( sigma_velocity_meas(43:63) , Y, ' -x k ' )
+title( ' Velocity RMS' )
+xlabel( 'U_{RMS} [m/s]' )
+ylabel( 'Y [mm]' )
+grid
+% legend ('\alpha = 0\circ', '\alpha = 5\circ', '\alpha = 15\circ')
+hold off
+>>>>>>> Stashed changes
